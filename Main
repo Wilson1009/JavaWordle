@@ -1,0 +1,117 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+
+	public static void main(String[] args) {
+
+		ArrayList<String> wordList = new ArrayList<>();
+		ArrayList<Character> alphabet = new ArrayList<>();
+
+		// Adds in the alphabet
+		for (char i = 'a'; i != 'z' + 1; i++) {
+			alphabet.add(i);
+		}
+
+		System.out.println(alphabet); //Shows all the letters
+
+		// Reads the file
+		try (Scanner input = new Scanner(new File("Words.txt"))) {
+			while (input.hasNext()) {
+				String word = input.next();
+				wordList.add(word);
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("File not Found");
+		}
+		// Picks a random word from the list
+		String answer = wordList.get((int) (Math.random() * wordList.size()) + 1);
+		// System.out.println(answer);
+		Scanner scanner = new Scanner(System.in);
+		// Game info
+		System.out.println("Letter not used: *\nLetter in wrong spot: ?");
+
+		System.out.print("How many tries do you want: ");
+
+		int attempts = scanner.nextInt();
+
+		System.out.print("Enter a 5 letter word in lowercase: ");
+
+		int counter = 1;
+		boolean wordFound = false;
+		// plays the game
+		while (wordFound == false) {
+			String input = scanner.next();
+
+			if (counter == attempts + 1) {
+				System.out.println("Too many tries. The word was: " + answer);
+				System.exit(0);
+			}
+			if (input.length() != 5) {
+				System.out.println("That is not a 5 letter word");
+				System.out.print("Enter a 5 letter word: ");
+			} else if (!wordList.contains(input)) {
+				System.out.print("That is not a word, try another word: ");
+			} else if (input.equals(answer)) {
+				System.out.println("You got the word!");
+				System.exit(0);
+			} else if (wordList.contains(input)) {
+				check(input, answer);
+				removeLetters(alphabet, input, answer);
+				System.out.print("Attempt " + counter + "/" + attempts + ". Next guess: ");
+				counter++;
+			}
+		}
+		scanner.close();
+	}
+
+	// checker and prints
+	public static Character check(String input, String answer) {
+		System.out.print("|");
+		for (int i = 0; i <= input.length() - 1; i++) {
+			System.out.print(" " + input.charAt(i) + " |");
+		}
+
+		System.out.println();
+
+		System.out.print("|");
+		for (int i = 0; i <= input.length() - 1; i++) {
+			if (input.charAt(i) == answer.charAt(i)) {
+				System.out.print(" " + input.charAt(i) + " |");
+			} else if (answer.indexOf(input.charAt(i)) != -1) {
+				System.out.print(" ? |");
+			} else {
+				System.out.print(" * |");
+			}
+		}
+
+		System.out.println();
+
+		return null;
+	}
+
+	// Removes and shows what letters are left
+	public static void removeLetters(ArrayList alphabet, String input, String answer) {
+
+		ArrayList<Character> usedLetters = new ArrayList<>();
+		// Puts used letters in an usedLetters list
+		for (int i = 0; i <= input.length() - 1; i++) {
+			usedLetters.add(input.charAt(i));
+		}
+		// answer and removes them
+		for (int i = 0; i <= input.length() - 1; i++) {
+			if (usedLetters.contains(answer.charAt(i))) {
+				usedLetters.remove(usedLetters.indexOf(answer.charAt(i)));
+			}
+		}
+		// Removes the letters
+		for (int i = 0; i <= alphabet.size() - 1; i++) {
+			if (usedLetters.contains(alphabet.get(i))) {
+				alphabet.remove(i);
+			}
+		}
+		System.out.println(alphabet); //Shows what letters are left
+	}
+}
